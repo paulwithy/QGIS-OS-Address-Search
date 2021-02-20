@@ -77,6 +77,10 @@ class OS_search_for_addresses:
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
+        marker = None
+        global addtable
+        global startmarkers
+        startmarkers = [ i for i in iface.mapCanvas().scene().items() if issubclass(type(i), QgsVertexMarker)]
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -191,6 +195,7 @@ class OS_search_for_addresses:
             self.iface.removeToolBarIcon(action)
 
     def getadd(self):
+       my_dir = dir()
        if self.dlg.APIKEY.text() == '':
         self.iface.messageBar().pushMessage(
          "Please enter OS API key",
@@ -204,15 +209,24 @@ class OS_search_for_addresses:
         json_response = urllib.request.urlopen(PlaceURL)
         rawresponse = json_response.read().decode('utf-8')
         jload = json.loads(rawresponse.replace("\'",''))
-        global addtable
-        addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
-        addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
-        addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
-        addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
-        addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
-        self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
+        if "results" in jload:
+          global addtable
+          addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
+          addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
+          addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
+          addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
+          addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
+          self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
+        else:
+         self.iface.messageBar().pushMessage(
+         "Enter more detail IE part postcode BB",
+         level=Qgis.Success, duration=7)
+       for varis in dir():
+        if varis not in my_dir and varis != "my_dir":
+         del varis
 
     def serpostcode(self):
+      my_dir = dir()
       if self.dlg.APIKEY.text() == '':
        self.iface.messageBar().pushMessage(
         "Please enter OS API key",
@@ -231,17 +245,25 @@ class OS_search_for_addresses:
         json_response = urllib.request.urlopen(PlaceURL)
         rawresponse = json_response.read().decode('utf-8')
         jload = json.loads(rawresponse.replace("\'",''))
-        global addtable
-        addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
-        addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
-        addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
-        addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
-        addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
-        self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
-        
+        if "results" in jload:
+          global addtable
+          addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
+          addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
+          addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
+          addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
+          addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
+          self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
+        else:
+         self.iface.messageBar().pushMessage(
+         "Enter more detail IE part postcode BB",
+         level=Qgis.Success, duration=7)
+      for varis in dir():
+       if varis not in my_dir and varis != "my_dir":
+         del varis
 
 
     def where(self):
+       my_dir = dir()
        if self.dlg.APIKEY.text() == '':
         self.iface.messageBar().pushMessage(
          "Please enter OS API key",
@@ -254,14 +276,11 @@ class OS_search_for_addresses:
         xform = QgsCoordinateTransform(crsSrc, crsDest, transformContext)
         min = xform.transform(QgsPointXY(addtable['LNG'][self.dlg.comboBoxadd.currentIndex()],addtable['LAT'][self.dlg.comboBoxadd.currentIndex()]))
         x, y  = min
-        #print(x)
-        #y = addtable['LAT'][self.dlg.comboBoxadd.currentIndex()]
-        #print(y)
         scale = 300
         rect = QgsRectangle(float(x) - scale, float(y) - scale, float(x) + scale, float(y) + scale)
         vertex_items = [ i for i in canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
-            if ver in canvas.scene().items():
+            if ver not in startmarkers and ver in canvas.scene().items():
              canvas.scene().removeItem(ver)
         canvas.setExtent(rect)
         marker = QgsVertexMarker(canvas)
@@ -269,16 +288,24 @@ class OS_search_for_addresses:
         marker.setPenWidth(2)
         marker.setCenter(QgsPointXY(int(x), int(y)))
         canvas.refresh()
+        #canvas.extentsChanged.connect(self.clearm)
+        for varis in dir():
+          if varis not in my_dir and varis != "my_dir":
+            del varis
 
     def clearm(self):
         canvas = iface.mapCanvas()
         vertex_items = [ i for i in canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
-            if ver in canvas.scene().items():
+            if ver not in startmarkers and ver in canvas.scene().items():
              canvas.scene().removeItem(ver)
         canvas.refresh()
+        #canvas.extentsChanged.disconnect(self.clearm)
+        del canvas
+        del vertex_items
 
     def getalladd(self):
+       my_dir = dir()
        if self.dlg.APIKEY.text() == '':
         self.iface.messageBar().pushMessage(
          "Please enter OS API key",
@@ -311,6 +338,9 @@ class OS_search_for_addresses:
         ercorrect = str(gej).replace("'",'"')
         vlayer = QgsVectorLayer(ercorrect, "oslayer", "ogr")
         QgsProject.instance().addMapLayer(vlayer)
+        for varis in dir():
+          if varis not in my_dir and varis != "my_dir":
+            del varis
 
     def storekey(self):
         s = QgsSettings()
@@ -328,16 +358,19 @@ class OS_search_for_addresses:
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
+        canvas = iface.mapCanvas()
         if self.first_start == True:
             self.first_start = False
             self.dlg = OS_search_for_addressesDialog()
             self.dlg.pushButtongetadd.clicked.connect(self.getadd)
             self.dlg.zoomad.clicked.connect(self.where)
             self.dlg.clearm.clicked.connect(self.clearm)
+            #canvas.extentsChanged.connect(self.clearm)
             self.dlg.getalladd.clicked.connect(self.getalladd)
             self.dlg.savekey.clicked.connect(self.storekey)
             self.dlg.loadkey.clicked.connect(self.readkey)
             self.dlg.serpostcode.clicked.connect(self.serpostcode)
+
 
 
         # show the dialog

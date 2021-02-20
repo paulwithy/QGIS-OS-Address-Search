@@ -6,7 +6,7 @@
 name=OS search for addresses
 qgisMinimumVersion=3.0
 description=Search for addresses if you have an OS API Key
-version=1.0
+version=1.2
 author=Paul Withington
 email=pwithy@hotmail.com
 
@@ -29,7 +29,7 @@ homepage=http://homepage
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
