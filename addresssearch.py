@@ -206,21 +206,26 @@ class OS_search_for_addresses:
         enquery = urllib.parse.quote(query)
         apikey = self.dlg.APIKEY.text()
         PlaceURL = 'https://api.os.uk/search/places/v1/find?dataset=DPA&key='+apikey+'&output_srs=EPSG%3A4326&minmatch=0.6&query='+enquery
-        json_response = urllib.request.urlopen(PlaceURL)
-        rawresponse = json_response.read().decode('utf-8')
-        jload = json.loads(rawresponse.replace("\'",''))
-        if "results" in jload:
-          global addtable
-          addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
-          addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
-          addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
-          addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
-          addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
-          self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
-        else:
+        try:
+         json_response = urllib.request.urlopen(PlaceURL)
+         rawresponse = json_response.read().decode('utf-8')
+         jload = json.loads(rawresponse.replace("\'",''))
+         if "results" in jload:
+           global addtable
+           addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
+           addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
+           addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
+           addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
+           addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
+           self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
+         else:
+          self.iface.messageBar().pushMessage(
+          "Enter more detail IE part postcode BB",
+          level=Qgis.Success, duration=7)
+        except:
          self.iface.messageBar().pushMessage(
-         "Enter more detail IE part postcode BB",
-         level=Qgis.Success, duration=7)
+          "Connection failed check proxy",
+          level=Qgis.Success, duration=7)
        for varis in dir():
         if varis not in my_dir and varis != "my_dir":
          del varis
@@ -242,21 +247,26 @@ class OS_search_for_addresses:
         enquery = urllib.parse.quote(query)
         apikey = self.dlg.APIKEY.text()
         PlaceURL = 'https://api.os.uk/search/places/v1/postcode?postcode='+enquery+'&key='+apikey+'&output_srs=EPSG%3A4326'
-        json_response = urllib.request.urlopen(PlaceURL)
-        rawresponse = json_response.read().decode('utf-8')
-        jload = json.loads(rawresponse.replace("\'",''))
-        if "results" in jload:
-          global addtable
-          addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
-          addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
-          addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
-          addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
-          addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
-          self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
-        else:
+        try:
+         json_response = urllib.request.urlopen(PlaceURL)
+         rawresponse = json_response.read().decode('utf-8')
+         jload = json.loads(rawresponse.replace("\'",''))
+         if "results" in jload:
+           global addtable
+           addtable= {"UPRN": [],"ADDRESS": [],"LNG": [],"LAT": []}
+           addtable['UPRN'] = [results['DPA']['UPRN'] for results in jload['results']]
+           addtable['ADDRESS'] = [results['DPA']['ADDRESS'] for results in jload['results']]
+           addtable['LNG'] = [results['DPA']['LNG'] for results in jload['results']]
+           addtable['LAT'] = [results['DPA']['LAT'] for results in jload['results']]
+           self.dlg.comboBoxadd.addItems(addtable['ADDRESS'])
+         else:
+          self.iface.messageBar().pushMessage(
+          "Enter more detail IE part postcode BB",
+          level=Qgis.Success, duration=7)
+        except:
          self.iface.messageBar().pushMessage(
-         "Enter more detail IE part postcode BB",
-         level=Qgis.Success, duration=7)
+          "Connection failed check proxy",
+          level=Qgis.Success, duration=7)
       for varis in dir():
        if varis not in my_dir and varis != "my_dir":
          del varis
@@ -322,22 +332,25 @@ class OS_search_for_addresses:
         mx, may = max
         box=str(miy)+','+str(mix)+','+str(may)+','+str(mx)
         PlaceURL = 'https://api.os.uk/search/places/v1/bbox?key='+apikey+'&bbox='+box+'&dataset=DPA&offset=0&output_srs=EPSG:4326&srs=EPSG:4326'
-        json_response = urllib.request.urlopen(PlaceURL)
-        rawresponse = json_response.read().decode('utf-8')
-        jload = json.loads(rawresponse.replace("\'",''))
-        gej = {"type": "FeatureCollection","features": []}
-        for r in jload['results']:
-         item = {"type": "Feature","properties": [],"geometry": {"type": "Point", "coordinates": []}}
-         item['properties'] = r['DPA']
-         item['geometry']['coordinates'] = ([r['DPA']['LNG'], r['DPA']['LAT']])
-         gej['features'].append(item)
-        
-        for feature in gej['features']:
-         del feature['properties']['BLPU_STATE_CODE']
-        
-        ercorrect = str(gej).replace("'",'"')
-        vlayer = QgsVectorLayer(ercorrect, "oslayer", "ogr")
-        QgsProject.instance().addMapLayer(vlayer)
+        try:
+         json_response = urllib.request.urlopen(PlaceURL)
+         rawresponse = json_response.read().decode('utf-8')
+         jload = json.loads(rawresponse.replace("\'",''))
+         gej = {"type": "FeatureCollection","features": []}
+         for r in jload['results']:
+          item = {"type": "Feature","properties": [],"geometry": {"type": "Point", "coordinates": []}}
+          item['properties'] = r['DPA']
+          item['geometry']['coordinates'] = ([r['DPA']['LNG'], r['DPA']['LAT']])
+          gej['features'].append(item)
+         for feature in gej['features']:
+          del feature['properties']['BLPU_STATE_CODE']
+         ercorrect = str(gej).replace("'",'"')
+         vlayer = QgsVectorLayer(ercorrect, "oslayer", "ogr")
+         QgsProject.instance().addMapLayer(vlayer)
+        except:
+         self.iface.messageBar().pushMessage(
+          "Connection failed check proxy",
+          level=Qgis.Success, duration=7)
         for varis in dir():
           if varis not in my_dir and varis != "my_dir":
             del varis
