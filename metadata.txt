@@ -4,29 +4,29 @@
 
 [general]
 name=OS search for addresses
-qgisMinimumVersion=3.0
-description=Search for addresses if you have an OS API Key
-version=1.2
+qgisMinimumVersion=3.22
+qgisMaximumVersion=4.99
+description=Search OS Places addresses using your OS Data Hub API key
+version=1.5.6
 author=Paul Withington
 email=pwithy@hotmail.com
 
-about=This is proof of concept and provided as is with not warranty. The plugin should allow you to use your OS API key to search for addresses.
+about=Search OS Places addresses, zoom to a selected result, or add addresses from the current map view. Requires an OS Data Hub API key.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/paulwithy/QGIS-OS-Address-Search/issues
+repository=https://github.com/paulwithy/QGIS-OS-Address-Search
 # End of mandatory metadata
 
 # Recommended items:
 
-hasProcessingProvider=no
+hasProcessingProvider=False
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=1.5.5 - Fixed Qt6 QLineEdit echo-mode enum compatibility.\n1.5.4 - Fixed QGIS 4 Qt6 loading by replacing the generated PyQt5 resource import with qgis.PyQt.\n1.5.3 - Repository release preparation, cross-version authentication hardening, documentation and packaging cleanup.\n1.5.2 - Fixed QGIS 3.40 authentication API compatibility.\n1.5.1 - Encrypted API key storage, masked key display, and paged BBOX loading up to 2,000 addresses with a 1 km² view limit.\n1.5.0 - Security hardening, improved error handling, and QGIS 3 / QGIS 4 compatibility.
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=address, postcode, OS Places, Ordnance Survey, search
 
-homepage=http://homepage
-category=Plugins
+homepage=https://github.com/paulwithy/QGIS-OS-Address-Search
 icon=icon.png
 # experimental flag
 experimental=False
@@ -39,8 +39,6 @@ deprecated=False
 # Check the documentation for more information.
 # plugin_dependencies=
 
-Category of the plugin: Raster, Vector, Database or Web
-# category=
 
 # If the plugin can run on QGIS Server.
 server=False

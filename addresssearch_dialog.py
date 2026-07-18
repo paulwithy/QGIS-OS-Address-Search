@@ -27,7 +27,20 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 
-# This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
+
+def _line_edit_echo_mode(name):
+    """Return a QLineEdit echo mode on both Qt5 and Qt6."""
+    echo_mode_enum = getattr(QtWidgets.QLineEdit, "EchoMode", None)
+    if echo_mode_enum is not None:
+        return getattr(echo_mode_enum, name)
+    return getattr(QtWidgets.QLineEdit, name)
+
+
+LINE_EDIT_NORMAL = _line_edit_echo_mode("Normal")
+LINE_EDIT_PASSWORD = _line_edit_echo_mode("Password")
+
+# This loads your .ui file so that PyQt can populate your plugin with the
+# elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'addresssearch_dialog_base.ui'))
 
@@ -42,3 +55,15 @@ class OS_search_for_addressesDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.APIKEY.setEchoMode(LINE_EDIT_PASSWORD)
+        self.showApiKey = QtWidgets.QCheckBox("Show key", self)
+        self.showApiKey.setGeometry(100, 205, 100, 20)
+        self.showApiKey.toggled.connect(self._toggle_api_key_visibility)
+
+    def _toggle_api_key_visibility(self, visible):
+        mode = (
+            LINE_EDIT_NORMAL
+            if visible
+            else LINE_EDIT_PASSWORD
+        )
+        self.APIKEY.setEchoMode(mode)
